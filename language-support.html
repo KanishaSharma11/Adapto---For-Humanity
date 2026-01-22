@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adapto | Language Support</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background: #0f1419; color: #e2e8f0; display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #1a2332 0%, #0f1419 100%);
+      padding: 2rem 1rem;
+      border-right: 1px solid rgba(94, 234, 212, 0.15);
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+    }
+
+    .logo-section h2 {
+      color: #5eead4;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-shadow: 0 0 15px rgba(94, 234, 212, 0.5);
+      margin-bottom: 0.3rem;
+    }
+
+    .logo-section p {
+      color: #64748b;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .nav-section {
+      margin-bottom: 2rem;
+    }
+
+    .nav-section-title {
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.8rem;
+      padding-left: 15px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: #5eead4;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar a:hover::before,
+    .sidebar a.active::before {
+      transform: scaleY(1);
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: rgba(94, 234, 212, 0.1);
+      color: #5eead4;
+      transform: translateX(5px);
+    }
+
+    .sidebar a .icon {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .logout-btn {
+      margin-top: auto;
+      padding: 12px;
+      width: 100%;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      padding: 2rem 3rem;
+      overflow-y: auto;
+      background: linear-gradient(135deg, #000000 0%, #000000 50%, #000000 100%);
+    }
+
+    .header {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      color: #5eead4;
+      text-shadow: 0 0 15px rgba(94, 234, 212, 0.3);
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* TRANSLATOR BOX */
+    .translator-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .translator-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .panel {
+      background: rgba(26, 35, 50, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      transition: all 0.4s ease;
+    }
+
+    .panel:hover {
+      border-color: rgba(94, 234, 212, 0.3);
+      box-shadow: 0 10px 40px rgba(94, 234, 212, 0.1);
+    }
+
+    .panel h3 {
+      color: #5eead4;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .language-select {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 12px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .language-select:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+    }
+
+    .language-select option {
+      background: #1a2332;
+      color: #e2e8f0;
+      padding: 10px;
+    }
+
+    .text-area {
+      width: 100%;
+      min-height: 180px;
+      padding: 1rem;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 12px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .text-area:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+    }
+
+    .text-area::placeholder {
+      color: #64748b;
+    }
+
+    .text-area[readonly] {
+      cursor: default;
+      background: rgba(15, 20, 25, 0.4);
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.9rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      background: rgba(94, 234, 212, 0.1);
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      color: #5eead4;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(94, 234, 212, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(94, 234, 212, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      color: white;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-listening {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    }
+
+    /* FEATURES GRID */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .feature-card {
+      background: rgba(26, 35, 50, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 1.8rem;
+      border-radius: 15px;
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      transition: all 0.4s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: #5eead4;
+      box-shadow: 0 10px 30px rgba(94, 234, 212, 0.15);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .feature-card h4 {
+      color: #5eead4;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+    }
+
+    .feature-card p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* FOOTER NOTE */
+    .footer-note {
+      text-align: center;
+      margin-top: 3rem;
+      padding: 1.5rem;
+      background: rgba(26, 35, 50, 0.4);
+      border-radius: 15px;
+      border: 1px solid rgba(94, 234, 212, 0.1);
+    }
+
+    .footer-note p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* CHAR COUNTER */
+    .char-counter {
+      text-align: right;
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    /* LOADING SPINNER */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(94, 234, 212, 0.3);
+      border-top-color: #5eead4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* PROFILE MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a2332, #0f1419);
+      border-radius: 20px;
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      margin-bottom: 2rem;
+    }
+
+    .modal-header h2 {
+      color: #5eead4;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-header p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(94, 234, 212, 0.1);
+      border: none;
+      color: #5eead4;
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      background: rgba(94, 234, 212, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .profile-field {
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-field label {
+      display: block;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .profile-field input {
+      width: 100%;
+      padding: 0.9rem;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .profile-field input:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+    }
+
+    .save-btn:hover {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+      }
+
+      .main {
+        padding: 1.5rem;
+      }
+
+      .translator-box {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo-section">
+      <svg width="200" height="70" viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main gradient -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="50%" stop-color="#7b2ff7"/>
+      <stop offset="100%" stop-color="#3d7dd9"/>
+    </linearGradient>
+    
+    <!-- Glow gradient -->
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7b2ff7" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Text gradient -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="100%" stop-color="#7b2ff7"/>
+    </linearGradient>
+    
+    <!-- Filter for shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Outer glow circles -->
+  <circle cx="35" cy="35" r="28" fill="url(#glowGradient)">
+    <animate attributeName="r" values="28;32;28" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Main outer circle with gradient -->
+  <circle cx="35" cy="35" r="24" fill="none" stroke="url(#mainGradient)" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Middle circle -->
+  <circle cx="35" cy="35" r="16" fill="url(#mainGradient)" filter="url(#shadow)"/>
+  
+  <!-- Inner orbiting circles (representing people/connection) -->
+  <g>
+    <!-- Left person -->
+    <circle cx="27" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;33;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Right person -->
+    <circle cx="43" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;37;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Connecting line (handshake representation) -->
+    <line x1="30" y1="35" x2="40" y2="35" stroke="#ffffff" stroke-width="1.5" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+  
+  <!-- Center heart/core -->
+  <circle cx="35" cy="35" r="4" fill="#ffffff">
+    <animate attributeName="r" values="4;5;4" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Text: Adapto -->
+  <text x="75" y="42" font-size="32" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="700" fill="url(#textGradient)">
+    Adapto
+  </text>
+  
+  <!-- Tagline -->
+  <text x="76" y="54" font-size="8" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="400" letter-spacing="2" fill="#64748b" opacity="0.8">
+    FOR HUMANITY
+  </text>
+  
+  <!-- Decorative dots -->
+  <circle cx="190" cy="20" r="2" fill="url(#mainGradient)" opacity="0.6">
+    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="185" cy="28" r="1.5" fill="url(#mainGradient)" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <a href="home.html">
+        <span class="icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" id="profileLink">
+        <span class="icon">👤</span>
+        <span>Profile Settings</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Services</div>
+      <a href="language-support.html" class="active">
+        <span class="icon">💬</span>
+        <span>Language Support</span>
+      </a>
+      <a href="healthcare.html">
+        <span class="icon">🏥</span>
+        <span>Healthcare</span>
+      </a>
+      <a href="housing.html">
+        <span class="icon">🏡</span>
+        <span>Housing</span>
+      </a>
+      <a href="jobs.html">
+        <span class="icon">💼</span>
+        <span>Jobs</span>
+      </a>
+      <a href="emergency.html">
+        <span class="icon">🆘</span>
+        <span>Emergency</span>
+      </a>
+      <a href="community.html">
+        <span class="icon">🤝</span>
+        <span>Community</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Tools</div>
+      <a href="documentAnalyzer.html" class="active">
+        <span class="icon">📄</span>
+        <span>Document Analyzer</span>
+      </a>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="header">
+      <h1>🌍 Language Support</h1>
+      <p>Speak or type in your language — Adapto translates instantly so you can communicate confidently anywhere. Break down language barriers and connect with people worldwide.</p>
+    </div>
+
+    <div class="translator-container">
+      <div class="translator-box">
+
+        <!-- SOURCE PANEL -->
+        <div class="panel">
+          <h3>🗣️ Your Language</h3>
+
+          <select id="sourceLang" class="language-select">
+            <option value="en">English</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="zh-CN">Chinese (中文)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="tr">Turkish (Türkçe)</option>
+            <option value="pl">Polish (Polski)</option>
+            <option value="uk">Ukrainian (Українська)</option>
+          </select>
+
+          <textarea id="sourceText" class="text-area" placeholder="Type here or use the microphone to speak..."></textarea>
+          <div class="char-counter"><span id="charCount">0</span> / 500</div>
+
+          <div class="controls">
+            <button class="btn btn-secondary" id="startVoice">
+              <span>🎤</span>
+              <span>Speak</span>
+            </button>
+            <button class="btn btn-secondary" id="clearText">
+              <span>🧹</span>
+              <span>Clear</span>
+            </button>
+          </div>
+
+          <button class="btn btn-primary" id="translateBtn">
+            <span>Translate</span>
+            <span>→</span>
+          </button>
+        </div>
+
+        <!-- TARGET PANEL -->
+        <div class="panel">
+          <h3>🌐 Translation</h3>
+
+          <select id="targetLang" class="language-select">
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="en">English</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="zh-CN">Chinese (中文)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="tr">Turkish (Türkçe)</option>
+            <option value="pl">Polish (Polski)</option>
+            <option value="uk">Ukrainian (Українська)</option>
+          </select>
+
+          <textarea id="translatedText" class="text-area" placeholder="Translation will appear here..." readonly></textarea>
+
+          <button class="btn btn-primary" id="speakOutput">
+            <span>🔊</span>
+            <span>Listen to Translation</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FEATURES -->
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🎤</span>
+          <h4>Voice Recognition</h4>
+          <p>Speak naturally and watch your words transform into text instantly with advanced speech recognition.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🌐</span>
+          <h4>15+ Languages</h4>
+          <p>Connect across cultures with support for major world languages including Arabic, Hindi, Chinese, and more.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🔊</span>
+          <h4>Text-to-Speech</h4>
+          <p>Hear translations pronounced correctly with natural-sounding voice output in any supported language.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">⚡</span>
+          <h4>Real-Time Translation</h4>
+          <p>Get instant translations as you type or speak, making conversations flow naturally without delays.</p>
+        </div>
+      </div>
+
+      <!-- FOOTER NOTE -->
+      <div class="footer-note">
+        <p>
+          <span>🔒</span>
+          <span>Your translations are processed securely. Voice input uses your browser only and no data is stored on our servers.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+      <button class="close-modal" id="closeModal">×</button>
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <p>Update your personal information</p>
+      </div>
+
+      <div class="profile-field">
+        <label>Full Name</label>
+        <input type="text" id="nameField" placeholder="Enter your name" />
+      </div>
+
+      <div class="profile-field">
+        <label>Email Address</label>
+        <input type="email" id="emailField" placeholder="Your email" disabled />
+      </div>
+
+      <button class="save-btn" id="saveProfile">💾 Save Changes</button>
+    </div>
+  </div>
+
+  <!-- FIREBASE & SCRIPTS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+     const firebaseConfig = {
+  apiKey: "AIzaSyAMkmKcKo-5qQciPsBVJI5hUgsiPHlB-bg",
+  authDomain: "adapto-1f1e2.firebaseapp.com",
+  projectId: "adapto-1f1e2",
+  storageBucket: "adapto-1f1e2.firebasestorage.app",
+  messagingSenderId: "258658013306",
+  appId: "1:258658013306:web:d5077f91ce58e8ad24abc3",
+  measurementId: "G-RCHLFYJHGY"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ✅ Load User Data
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById("nameField").value = data.name || "User";
+        document.getElementById("emailField").value = data.email || user.email;
+      }
+    });
+
+    // ✅ Profile Modal
+    const profileModal = document.getElementById("profileModal");
+    const profileLink = document.getElementById("profileLink");
+    const closeModal = document.getElementById("closeModal");
+
+    profileLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      profileModal.classList.add("active");
+    });
+
+    closeModal.addEventListener("click", () => {
+      profileModal.classList.remove("active");
+    });
+
+    profileModal.addEventListener("click", (e) => {
+      if (e.target === profileModal) {
+        profileModal.classList.remove("active");
+      }
+    });
+
+    // ✅ Save Profile
+    document.getElementById("saveProfile").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const newName = document.getElementById("nameField").value.trim();
+
+      if (!newName) {
+        alert("Name cannot be empty!");
+        return;
+      }
+
+      await setDoc(doc(db, "users", user.uid), {
+        name: newName
+      }, { merge: true });
+
+      alert("✅ Profile updated successfully!");
+      profileModal.classList.remove("active");
+    });
+
+    // ✅ Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      if (confirm("Are you sure you want to logout?")) {
+        await signOut(auth);
+        window.location.href = "index.html";
+      }
+    });
+
+    // ✅ Active Link Highlighting
+    document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', function() {
+        document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+  </script>
+
+  <script>
+    /* ------------------ CHARACTER COUNTER ------------------ */
+    const sourceText = document.getElementById("sourceText");
+    const charCount = document.getElementById("charCount");
+
+    sourceText.addEventListener("input", () => {
+      const length = sourceText.value.length;
+      charCount.textContent = length;
+      
+      if (length > 500) {
+        sourceText.value = sourceText.value.substring(0, 500);
+        charCount.textContent = 500;
+      }
+    });
+
+    /* ------------------ SPEECH TO TEXT ------------------ */
+    const startVoice = document.getElementById("startVoice");
+    const sourceLang = document.getElementById("sourceLang");
+
+    let recognition;
+    let isListening = false;
+
+    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      startVoice.onclick = () => {
+        if (!isListening) {
+          recognition.lang = sourceLang.value;
+          recognition.start();
+
+          isListening = true;
+          startVoice.innerHTML = '<span>🛑</span><span>Listening...</span>';
+          startVoice.classList.add("btn-listening");
+        } else {
+          recognition.stop();
+        }
+      };
+
+      recognition.onresult = (event) => {
+        sourceText.value = event.results[0][0].transcript;
+        charCount.textContent = sourceText.value.length;
+      };
+
+      recognition.onend = () => {
+        resetMicButton();
+      };
+
+      recognition.onerror = () => {
+        resetMicButton();
+        alert("🎤 Microphone error. Please check permissions and try again.");
+      };
+
+      function resetMicButton() {
+        isListening = false;
+        startVoice.innerHTML = '<span>🎤</span><span>Speak</span>';
+        startVoice.classList.remove("btn-listening");
+      }
+    } else {
+      startVoice.disabled = true;
+      startVoice.innerHTML = '<span>🎤</span><span>Not Supported</span>';
+    }
+
+    /* ------------------ TRANSLATION ------------------ */
+    const translateBtn = document.getElementById("translateBtn");
+    const translatedText = document.getElementById("translatedText");
+    const targetLang = document.getElementById("targetLang");
+
+    translateBtn.onclick = async () => {
+      const text = sourceText.value.trim();
+      if (!text) {
+        alert("⚠️ Please enter some text to translate");
+        return;
+      }
+
+      const source = sourceLang.value;
+      const target = targetLang.value;
+
+      if (source === target) {
+        alert("⚠️ Source and target languages cannot be the same");
+        return;
+      }
+
+      // Show loading state
+      const originalText = translateBtn.innerHTML;
+      translateBtn.innerHTML = '<span class="loading"></span><span>Translating...</span>';
+      translateBtn.disabled = true;
+
+      try {
+        const res = await fetch(
+          `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`
+        );
+
+        if (!res.ok) throw new Error("Translation failed");
+
+        const data = await res.json();
+        
+        if (data.responseData && data.responseData.translatedText) {
+          translatedText.value = data.responseData.translatedText;
+        } else {
+          throw new Error("Invalid response");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠️ Translation service is currently unavailable. Please try again in a moment.");
+        translatedText.value = "";
+      } finally {
+        translateBtn.innerHTML = originalText;
+        translateBtn.disabled = false;
+      }
+    };
+
+    // Allow Enter key to translate (Shift+Enter for new line)
+    sourceText.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        translateBtn.click();
+      }
+    });
+
+    /* ------------------ TEXT TO SPEECH ------------------ */
+    const speakOutput = document.getElementById("speakOutput");
+
+    speakOutput.onclick = () => {
+      const text = translatedText.value.trim();
+      if (!text) {
+        alert("⚠️ No translation to speak. Please translate some text first.");
+        return;
+      }
+
+      // Stop any ongoing speech
+      speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = targetLang.value;
+      utterance.rate = 0.9; // Slightly slower for clarity
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
+      // Visual feedback
+      const originalText = speakOutput.innerHTML;
+      speakOutput.innerHTML = '<span>🔊</span><span>Speaking...</span>';
+      speakOutput.disabled = true;
+
+      utterance.onend = () => {
+        speakOutput.innerHTML = originalText;
+        speakOutput.disabled = false;
+      };
+
+      utterance.onerror = () => {
+        speakOutput.innerHTML = originalText;
+        speakOutput.disabled = false;
+        alert("⚠️ Text-to-speech is not available for this language.");
+      };
+
+      speechSynthesis.speak(utterance);
+    };
+
+    /* ------------------ CLEAR BUTTON ------------------ */
+    document.getElementById("clearText").onclick = () => {
+      sourceText.value = "";
+      translatedText.value = "";
+      charCount.textContent = "0";
+      speechSynthesis.cancel();
+    };
+
+    /* ------------------ AUTO-TRANSLATE ON LANGUAGE CHANGE ------------------ */
+    targetLang.addEventListener("change", () => {
+      if (sourceText.value.trim() && translatedText.value.trim()) {
+        translateBtn.click();
+      }
+    });
+
+  </script>
+
+</body>
+</html>
