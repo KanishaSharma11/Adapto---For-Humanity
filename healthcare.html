@@ -709,14 +709,15 @@
     } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
     const firebaseConfig = {
-  apiKey: "ApiKey",
-  authDomain: "AuthDomain",
-  projectId: "ProjectId",
-  storageBucket: "StorageBucket",
-  messagingSenderId: "MessagingSenderId",
-  appId: "AppId",
-  measurementId: "MeasurementId"
+  apiKey: process.env.ApiKey,
+  authDomain: process.env.AuthDomain,
+  projectId: proecess.env.ProjectId,
+  storageBucket: process.env.StorageBucket,
+  messagingSenderId: process.env.MessagingSenderId,
+  appId: process.env.AppId,
+  measurementId: process.env.MeasurementId
 };
+
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -798,7 +799,7 @@
   </script>
 
   <script>
-    const ORS_API_KEY = "ORS_API_KEY";
+    const ORS_API_KEY = process.env.ORS_API_KEY;
 
     let map;
     let userMarker;
@@ -954,7 +955,7 @@
   }
 
   try {
-    const url = "URL";
+    const url = process.env.URL;
 
     const res = await fetch(url, {
       method: "POST",
