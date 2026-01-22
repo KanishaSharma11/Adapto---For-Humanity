@@ -981,7 +981,7 @@
       e.preventDefault();
       uploadZone.classList.remove("dragover");
       const file = e.dataTransfer.files[0];
-      if (file && (file.type === "application/pdf" || file.type === "text/plain")) {
+      if (file && (file.name.endsWith(".pdf") || file.name.endsWith(".txt"))) {
         handleFile(file);
       } else {
         alert("⚠️ Please upload a PDF or TXT file");
@@ -990,11 +990,12 @@
 
     // ✅ File Input
     fileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        handleFile(file);
-      }
-    });
+  const file = e.target.files[0];
+  if (file && (file.name.endsWith(".pdf") || file.name.endsWith(".txt"))) {
+    handleFile(file);
+  }
+});
+
 
     // ✅ Handle File
     function handleFile(file) {
@@ -1041,75 +1042,99 @@
     }
 
     // ✅ Analyze Document
-    analyzeBtn.addEventListener("click", async () => {
-      if (!selectedFile) {
-        alert("⚠️ Please upload a document first");
-        return;
-      }
+    //////////////////////////////////////////////////////
+// ✅ Analyze Document (Gemini backend call)
+//////////////////////////////////////////////////////
 
-      // Hide upload card, show loading
-      document.querySelector(".upload-card").style.display = "none";
-      resultCard.classList.remove("active");
-      loadingContainer.classList.add("active");
+analyzeBtn.addEventListener("click", async () => {
+  if (!selectedFile) {
+    alert("⚠️ Please upload a document first");
+    return;
+  }
 
-      try {
-        // Extract text
-        let documentText = "";
-        
-        if (selectedFile.type === "application/pdf") {
-          documentText = await extractTextFromPDF(selectedFile);
-        } else {
-          documentText = await selectedFile.text();
-        }
+  // Hide upload, show loading
+  document.querySelector(".upload-card").style.display = "none";
+  resultCard.classList.remove("active");
+  loadingContainer.classList.add("active");
 
-        if (!documentText.trim()) {
-          throw new Error("No text found in document");
-        }
+  try {
+    let documentText = "";
 
-        // Call Gemini API
-      // Call backend instead of Gemini directly
-const response = await fetch("/api/gemini", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ documentText })
+    // ✅ safer file type check (extension based)
+    if (selectedFile.name.endsWith(".pdf")) {
+      documentText = await extractTextFromPDF(selectedFile);
+    } else {
+      documentText = await selectedFile.text();
+    }
+
+    if (!documentText.trim()) {
+      throw new Error("No text found in document");
+    }
+
+    // ✅ call secure backend (NOT Gemini directly)
+    const response = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ documentText })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // ✅ show result
+    resultContent.textContent = data.result;
+
+    loadingContainer.classList.remove("active");
+    resultCard.classList.add("active");
+
+  } catch (error) {
+    console.error(error);
+    alert("❌ Failed to analyze document");
+
+    loadingContainer.classList.remove("active");
+    document.querySelector(".upload-card").style.display = "block";
+  }
 });
 
-if (!response.ok) {
-  throw new Error(`API Error: ${response.status}`);
-}
 
-const data = await response.json();
-const simplified = data.result;
+//////////////////////////////////////////////////////
+// ✅ Copy Result (OUTSIDE analyze)
+//////////////////////////////////////////////////////
+
+copyBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(resultContent.textContent);
+
+    const original = copyBtn.innerHTML;
+    copyBtn.innerHTML = "✅ Copied!";
+
+    setTimeout(() => {
+      copyBtn.innerHTML = original;
+    }, 1500);
+
+  } catch {
+    alert("❌ Failed to copy");
+  }
+});
 
 
+//////////////////////////////////////////////////////
+// ✅ New Analysis (OUTSIDE analyze)
+//////////////////////////////////////////////////////
 
-    // ✅ Copy Result
-    copyBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(resultContent.textContent);
-        
-        // Visual feedback
-        const originalText = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
-        
-        setTimeout(() => {
-          copyBtn.innerHTML = originalText;
-        }, 2000);
-      } catch (error) {
-        alert("❌ Failed to copy to clipboard");
-      }
-    });
+newAnalysisBtn.addEventListener("click", () => {
+  selectedFile = null;
+  fileInput.value = "";
+  fileInfo.classList.remove("active");
+  analyzeBtn.disabled = true;
 
-    // ✅ New Analysis
-    newAnalysisBtn.addEventListener("click", () => {
-      selectedFile = null;
-      fileInput.value = "";
-      fileInfo.classList.remove("active");
-      analyzeBtn.disabled = true;
-      resultCard.classList.remove("active");
-      document.querySelector(".upload-card").style.display = "block";
-      resultContent.textContent = "";
-    });
+  resultCard.classList.remove("active");
+  document.querySelector(".upload-card").style.display = "block";
+  resultContent.textContent = "";
+});
 
   </script>
 
