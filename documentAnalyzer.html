@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adapto | Document Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background: #0f1419; color: #e2e8f0; display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #1a2332 0%, #0f1419 100%);
+      padding: 2rem 1rem;
+      border-right: 1px solid rgba(94, 234, 212, 0.15);
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+    }
+
+    .logo-section h2 {
+      color: #5eead4;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-shadow: 0 0 15px rgba(94, 234, 212, 0.5);
+      margin-bottom: 0.3rem;
+    }
+
+    .logo-section p {
+      color: #64748b;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .nav-section {
+      margin-bottom: 2rem;
+    }
+
+    .nav-section-title {
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.8rem;
+      padding-left: 15px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: #5eead4;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar a:hover::before,
+    .sidebar a.active::before {
+      transform: scaleY(1);
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: rgba(94, 234, 212, 0.1);
+      color: #5eead4;
+      transform: translateX(5px);
+    }
+
+    .sidebar a .icon {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .logout-btn {
+      margin-top: auto;
+      padding: 12px;
+      width: 100%;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 2rem 3rem 1.5rem 3rem;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+      background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      color: #5eead4;
+      text-shadow: 0 0 15px rgba(94, 234, 212, 0.3);
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* CONTENT AREA */
+    .content-area {
+      flex: 1;
+      padding: 3rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .content-area::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .content-area::-webkit-scrollbar-track {
+      background: rgba(15, 20, 25, 0.4);
+    }
+
+    .content-area::-webkit-scrollbar-thumb {
+      background: rgba(94, 234, 212, 0.3);
+      border-radius: 4px;
+    }
+
+    /* UPLOAD CARD */
+    .upload-card {
+      background: rgba(26, 35, 50, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .card-title {
+      color: #5eead4;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upload-zone {
+      border: 2px dashed rgba(94, 234, 212, 0.3);
+      border-radius: 15px;
+      padding: 3rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(15, 20, 25, 0.4);
+      position: relative;
+    }
+
+    .upload-zone:hover {
+      border-color: #5eead4;
+      background: rgba(94, 234, 212, 0.05);
+    }
+
+    .upload-zone.dragover {
+      border-color: #5eead4;
+      background: rgba(94, 234, 212, 0.1);
+      transform: scale(1.02);
+    }
+
+    .upload-zone input {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      color: #5eead4;
+    }
+
+    .upload-text {
+      color: #e2e8f0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .file-info {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(94, 234, 212, 0.1);
+      border-radius: 10px;
+      display: none;
+    }
+
+    .file-info.active {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-icon {
+      font-size: 2rem;
+    }
+
+    .file-details {
+      flex: 1;
+    }
+
+    .file-name {
+      color: #5eead4;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .file-size {
+      color: #94a3b8;
+      font-size: 0.85rem;
+    }
+
+    .btn-remove {
+      padding: 0.5rem 1rem;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      color: #ef4444;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .btn-remove:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .analyze-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* LOADING STATE */
+    .loading-container {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .loading-container.active {
+      display: block;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(94, 234, 212, 0.1);
+      border-top-color: #5eead4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #5eead4;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .loading-hint {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    /* RESULT CARD */
+    .result-card {
+      display: none;
+      background: rgba(26, 35, 50, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      animation: slideIn 0.3s ease;
+    }
+
+    .result-card.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+    }
+
+    .result-title {
+      color: #5eead4;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-copy {
+      padding: 0.8rem 1.5rem;
+      background: rgba(94, 234, 212, 0.1);
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      border-radius: 10px;
+      color: #5eead4;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-copy:hover {
+      background: rgba(94, 234, 212, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .result-content {
+      background: rgba(15, 20, 25, 0.6);
+      padding: 2rem;
+      border-radius: 12px;
+      line-height: 1.8;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .result-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .result-content::-webkit-scrollbar-track {
+      background: rgba(15, 20, 25, 0.4);
+      border-radius: 4px;
+    }
+
+    .result-content::-webkit-scrollbar-thumb {
+      background: rgba(94, 234, 212, 0.3);
+      border-radius: 4px;
+    }
+
+    .btn-new {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(94, 234, 212, 0.1);
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      border-radius: 10px;
+      color: #5eead4;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      margin-top: 1.5rem;
+    }
+
+    .btn-new:hover {
+      background: rgba(94, 234, 212, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a2332, #0f1419);
+      border-radius: 20px;
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      margin-bottom: 2rem;
+    }
+
+    .modal-header h2 {
+      color: #5eead4;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-header p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(94, 234, 212, 0.1);
+      border: none;
+      color: #5eead4;
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      background: rgba(94, 234, 212, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .profile-field {
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-field label {
+      display: block;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .profile-field input {
+      width: 100%;
+      padding: 0.9rem;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .profile-field input:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+    }
+
+    .save-btn:hover {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+      }
+
+      .content-area {
+        padding: 1.5rem;
+      }
+
+      .header {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo-section">
+      <svg width="200" height="70" viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main gradient -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="50%" stop-color="#7b2ff7"/>
+      <stop offset="100%" stop-color="#3d7dd9"/>
+    </linearGradient>
+    
+    <!-- Glow gradient -->
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7b2ff7" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Text gradient -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="100%" stop-color="#7b2ff7"/>
+    </linearGradient>
+    
+    <!-- Filter for shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Outer glow circles -->
+  <circle cx="35" cy="35" r="28" fill="url(#glowGradient)">
+    <animate attributeName="r" values="28;32;28" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Main outer circle with gradient -->
+  <circle cx="35" cy="35" r="24" fill="none" stroke="url(#mainGradient)" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Middle circle -->
+  <circle cx="35" cy="35" r="16" fill="url(#mainGradient)" filter="url(#shadow)"/>
+  
+  <!-- Inner orbiting circles (representing people/connection) -->
+  <g>
+    <!-- Left person -->
+    <circle cx="27" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;33;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Right person -->
+    <circle cx="43" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;37;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Connecting line (handshake representation) -->
+    <line x1="30" y1="35" x2="40" y2="35" stroke="#ffffff" stroke-width="1.5" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+  
+  <!-- Center heart/core -->
+  <circle cx="35" cy="35" r="4" fill="#ffffff">
+    <animate attributeName="r" values="4;5;4" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Text: Adapto -->
+  <text x="75" y="42" font-size="32" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="700" fill="url(#textGradient)">
+    Adapto
+  </text>
+  
+  <!-- Tagline -->
+  <text x="76" y="54" font-size="8" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="400" letter-spacing="2" fill="#64748b" opacity="0.8">
+    FOR HUMANITY
+  </text>
+  
+  <!-- Decorative dots -->
+  <circle cx="190" cy="20" r="2" fill="url(#mainGradient)" opacity="0.6">
+    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="185" cy="28" r="1.5" fill="url(#mainGradient)" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <a href="home.html">
+        <span class="icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" id="profileLink">
+        <span class="icon">👤</span>
+        <span>Profile Settings</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Services</div>
+      <a href="language-support.html">
+        <span class="icon">💬</span>
+        <span>Language Support</span>
+      </a>
+      <a href="healthcare.html">
+        <span class="icon">🏥</span>
+        <span>Healthcare</span>
+      </a>
+      <a href="housing.html">
+        <span class="icon">🏡</span>
+        <span>Housing</span>
+      </a>
+      <a href="jobs.html">
+        <span class="icon">💼</span>
+        <span>Jobs</span>
+      </a>
+      <a href="emergency.html">
+        <span class="icon">🆘</span>
+        <span>Emergency</span>
+      </a>
+      <a href="community.html">
+        <span class="icon">🤝</span>
+        <span>Community</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Tools</div>
+      <a href="documentAnalyzer.html" class="active">
+        <span class="icon">📄</span>
+        <span>Document Analyzer</span>
+      </a>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="header">
+      <h1>📄 Document Analyzer</h1>
+      <p>Upload any PDF or text document in any language. Get a simplified explanation that anyone can understand.</p>
+    </div>
+
+    <div class="content-area">
+      
+      <!-- UPLOAD CARD -->
+      <div class="upload-card">
+        <h3 class="card-title">
+          <span>📤</span>
+          <span>Upload Document</span>
+        </h3>
+
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".pdf,.txt" />
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">Drop your document here or click to browse</div>
+          <div class="upload-hint">Supports PDF and TXT files • Any language</div>
+        </div>
+
+        <div class="file-info" id="fileInfo">
+          <div class="file-icon">📄</div>
+          <div class="file-details">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+          </div>
+          <button class="btn-remove" id="removeBtn">Remove</button>
+        </div>
+
+        <button class="analyze-btn" id="analyzeBtn" disabled>
+          <span>🧠</span>
+          <span>Analyze & Simplify</span>
+        </button>
+      </div>
+
+      <!-- LOADING STATE -->
+      <div class="loading-container" id="loadingContainer">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Analyzing Your Document</div>
+        <div class="loading-hint">Processing text and generating simplified explanation...</div>
+      </div>
+
+      <!-- RESULT CARD -->
+      <div class="result-card" id="resultCard">
+        <div class="result-header">
+          <h3 class="result-title">
+            <span>✨</span>
+            <span>Simplified Explanation</span>
+          </h3>
+          <button class="btn-copy" id="copyBtn">
+            <span>📋</span>
+            <span>Copy</span>
+          </button>
+        </div>
+        <div class="result-content" id="resultContent"></div>
+        <button class="btn-new" id="newAnalysisBtn">📄 Analyze Another Document</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+      <button class="close-modal" id="closeModal">×</button>
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <p>Update your personal information</p>
+      </div>
+
+      <div class="profile-field">
+        <label>Full Name</label>
+        <input type="text" id="nameField" placeholder="Enter your name" />
+      </div>
+
+      <div class="profile-field">
+        <label>Email Address</label>
+        <input type="email" id="emailField" placeholder="Your email" disabled />
+      </div>
+
+      <button class="save-btn" id="saveProfile">💾 Save Changes</button>
+    </div>
+  </div>
+
+  <!-- FIREBASE & SCRIPTS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDscqlw05bDEOFqIJWYH-nnCr4KaBeOS-c",
+      authDomain: "ecoops-360-9a241.firebaseapp.com",
+      projectId: "ecoops-360-9a241",
+      storageBucket: "ecoops-360-9a241.firebasestorage.app",
+      messagingSenderId: "872905064713",
+      appId: "1:872905064713:web:e594f9f33cb01cf89913d8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ✅ Auth State
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById("nameField").value = data.name || "User";
+        document.getElementById("emailField").value = data.email || user.email;
+      }
+    });
+
+    // ✅ Profile Modal
+    const profileModal = document.getElementById("profileModal");
+    const profileLink = document.getElementById("profileLink");
+    const closeModal = document.getElementById("closeModal");
+
+    profileLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      profileModal.classList.add("active");
+    });
+
+    closeModal.addEventListener("click", () => {
+      profileModal.classList.remove("active");
+    });
+
+    profileModal.addEventListener("click", (e) => {
+      if (e.target === profileModal) {
+        profileModal.classList.remove("active");
+      }
+    });
+
+    // ✅ Save Profile
+    document.getElementById("saveProfile").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const newName = document.getElementById("nameField").value.trim();
+
+      if (!newName) {
+        alert("Name cannot be empty!");
+        return;
+      }
+
+      await setDoc(doc(db, "users", user.uid), {
+        name: newName
+      }, { merge: true });
+
+      alert("✅ Profile updated successfully!");
+      profileModal.classList.remove("active");
+    });
+
+    // ✅ Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      if (confirm("Are you sure you want to logout?")) {
+        await signOut(auth);
+        window.location.href = "index.html";
+      }
+    });
+
+    // ✅ Active Link Highlighting
+    document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', function() {
+        document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+  </script>
+
+  <script>
+    const uploadZone = document.getElementById("uploadZone");
+    const fileInput = document.getElementById("fileInput");
+    const fileInfo = document.getElementById("fileInfo");
+    const fileName = document.getElementById("fileName");
+    const fileSize = document.getElementById("fileSize");
+    const removeBtn = document.getElementById("removeBtn");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const loadingContainer = document.getElementById("loadingContainer");
+    const resultCard = document.getElementById("resultCard");
+    const resultContent = document.getElementById("resultContent");
+    const copyBtn = document.getElementById("copyBtn");
+    const newAnalysisBtn = document.getElementById("newAnalysisBtn");
+
+    let selectedFile = null;
+
+    // ✅ Drag and Drop
+    uploadZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadZone.classList.add("dragover");
+    });
+
+    uploadZone.addEventListener("dragleave", () => {
+      uploadZone.classList.remove("dragover");
+    });
+
+    uploadZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove("dragover");
+      const file = e.dataTransfer.files[0];
+      if (file && (file.type === "application/pdf" || file.type === "text/plain")) {
+        handleFile(file);
+      } else {
+        alert("⚠️ Please upload a PDF or TXT file");
+      }
+    });
+
+    // ✅ File Input
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleFile(file);
+      }
+    });
+
+    // ✅ Handle File
+    function handleFile(file) {
+      selectedFile = file;
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+      fileInfo.classList.add("active");
+      analyzeBtn.disabled = false;
+    }
+
+    // ✅ Format File Size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+    // ✅ Remove File
+    removeBtn.addEventListener("click", () => {
+      selectedFile = null;
+      fileInput.value = "";
+      fileInfo.classList.remove("active");
+      analyzeBtn.disabled = true;
+    });
+
+    // ✅ Extract Text from PDF
+    async function extractTextFromPDF(file) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(" ") + "\n";
+        }
+
+        return text;
+      } catch (error) {
+        console.error("PDF extraction error:", error);
+        throw new Error("Failed to extract text from PDF");
+      }
+    }
+
+    // ✅ Analyze Document
+    analyzeBtn.addEventListener("click", async () => {
+      if (!selectedFile) {
+        alert("⚠️ Please upload a document first");
+        return;
+      }
+
+      // Hide upload card, show loading
+      document.querySelector(".upload-card").style.display = "none";
+      resultCard.classList.remove("active");
+      loadingContainer.classList.add("active");
+
+      try {
+        // Extract text
+        let documentText = "";
+        
+        if (selectedFile.type === "application/pdf") {
+          documentText = await extractTextFromPDF(selectedFile);
+        } else {
+          documentText = await selectedFile.text();
+        }
+
+        if (!documentText.trim()) {
+          throw new Error("No text found in document");
+        }
+
+        // Call Gemini API
+      // Call backend instead of Gemini directly
+const response = await fetch("/api/gemini", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ documentText })
+});
+
+if (!response.ok) {
+  throw new Error(`API Error: ${response.status}`);
+}
+
+const data = await response.json();
+const simplified = data.result;
+
+
+
+    // ✅ Copy Result
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(resultContent.textContent);
+        
+        // Visual feedback
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+        }, 2000);
+      } catch (error) {
+        alert("❌ Failed to copy to clipboard");
+      }
+    });
+
+    // ✅ New Analysis
+    newAnalysisBtn.addEventListener("click", () => {
+      selectedFile = null;
+      fileInput.value = "";
+      fileInfo.classList.remove("active");
+      analyzeBtn.disabled = true;
+      resultCard.classList.remove("active");
+      document.querySelector(".upload-card").style.display = "block";
+      resultContent.textContent = "";
+    });
+
+  </script>
+
+</body>
+</html>
