@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adapto | Housing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background: #0f1419; color: #e2e8f0; display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #1a2332 0%, #0f1419 100%);
+      padding: 2rem 1rem;
+      border-right: 1px solid rgba(94, 234, 212, 0.15);
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+    }
+
+    .logo-section h2 {
+      color: #5eead4;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-shadow: 0 0 15px rgba(94, 234, 212, 0.5);
+      margin-bottom: 0.3rem;
+    }
+
+    .logo-section p {
+      color: #64748b;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .nav-section {
+      margin-bottom: 2rem;
+    }
+
+    .nav-section-title {
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.8rem;
+      padding-left: 15px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: #5eead4;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar a:hover::before,
+    .sidebar a.active::before {
+      transform: scaleY(1);
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: rgba(94, 234, 212, 0.1);
+      color: #5eead4;
+      transform: translateX(5px);
+    }
+
+    .sidebar a .icon {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .logout-btn {
+      margin-top: auto;
+      padding: 12px;
+      width: 100%;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 2rem 3rem 1.5rem 3rem;
+      border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+      background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      color: #5eead4;
+      text-shadow: 0 0 15px rgba(94, 234, 212, 0.3);
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* CONTENT AREA */
+    .content-area {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    /* POST HOUSING SECTION */
+    .post-section {
+      background: rgba(26, 35, 50, 0.6);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(94, 234, 212, 0.15);
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .post-section::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .post-section::-webkit-scrollbar-track {
+      background: rgba(15, 20, 25, 0.4);
+    }
+
+    .post-section::-webkit-scrollbar-thumb {
+      background: rgba(94, 234, 212, 0.3);
+      border-radius: 4px;
+    }
+
+    .section-title {
+      color: #5eead4;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-field {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-field label {
+      display: block;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      padding: 0.9rem;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+    }
+
+    .form-field textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    #postMap {
+      height: 250px;
+      border-radius: 12px;
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      margin-bottom: 0.5rem;
+    }
+
+    .map-hint {
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+    }
+
+    /* SEARCH SECTION */
+    .search-section {
+      background: #000000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .search-controls {
+      padding: 1.5rem 2rem;
+      background: rgba(26, 35, 50, 0.6);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(94, 234, 212, 0.15);
+    }
+
+    .search-controls h3 {
+      color: #5eead4;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .search-input-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .search-input-group input {
+      flex: 1;
+      padding: 0.9rem;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input-group input:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+    }
+
+    .btn-search {
+      padding: 0.9rem 2rem;
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .btn-search:hover {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      transform: translateY(-2px);
+    }
+
+    .housing-list {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .housing-list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .housing-list::-webkit-scrollbar-track {
+      background: rgba(15, 20, 25, 0.4);
+    }
+
+    .housing-list::-webkit-scrollbar-thumb {
+      background: rgba(94, 234, 212, 0.3);
+      border-radius: 4px;
+    }
+
+    /* HOUSING CARDS */
+    .housing-card {
+      background: rgba(26, 35, 50, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .housing-card:hover {
+      border-color: #5eead4;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(94, 234, 212, 0.15);
+    }
+
+    .housing-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+
+    .housing-title {
+      color: #5eead4;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .housing-address {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .housing-badge {
+      padding: 0.4rem 0.8rem;
+      background: rgba(94, 234, 212, 0.1);
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      border-radius: 6px;
+      color: #5eead4;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .housing-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(15, 20, 25, 0.4);
+      border-radius: 10px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-label {
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    .info-value {
+      color: #5eead4;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .housing-description {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 1rem 0;
+    }
+
+    .housing-actions {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .btn-view {
+      flex: 1;
+      padding: 0.8rem;
+      background: rgba(94, 234, 212, 0.1);
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      border-radius: 8px;
+      color: #5eead4;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-view:hover {
+      background: rgba(94, 234, 212, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-delete {
+      padding: 0.8rem 1.5rem;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-delete:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: translateY(-2px);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      color: #5eead4;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+
+    /* LOADING */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(94, 234, 212, 0.1);
+      border-top-color: #5eead4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a2332, #0f1419);
+      border-radius: 20px;
+      border: 1px solid rgba(94, 234, 212, 0.2);
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      margin-bottom: 2rem;
+    }
+
+    .modal-header h2 {
+      color: #5eead4;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-header p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(94, 234, 212, 0.1);
+      border: none;
+      color: #5eead4;
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      background: rgba(94, 234, 212, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .profile-field {
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-field label {
+      display: block;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .profile-field input {
+      width: 100%;
+      padding: 0.9rem;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid rgba(94, 234, 212, 0.1);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .profile-field input:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+    }
+
+    .save-btn:hover {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+      }
+
+      .content-area {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .post-section {
+        border-right: none;
+        border-bottom: 1px solid rgba(94, 234, 212, 0.15);
+        max-height: 50vh;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 1.5rem;
+      }
+
+      .search-input-group {
+        flex-direction: column;
+      }
+
+      .housing-info {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo-section">
+      <svg width="200" height="70" viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main gradient -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="50%" stop-color="#7b2ff7"/>
+      <stop offset="100%" stop-color="#3d7dd9"/>
+    </linearGradient>
+    
+    <!-- Glow gradient -->
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7b2ff7" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Text gradient -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="100%" stop-color="#7b2ff7"/>
+    </linearGradient>
+    
+    <!-- Filter for shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Outer glow circles -->
+  <circle cx="35" cy="35" r="28" fill="url(#glowGradient)">
+    <animate attributeName="r" values="28;32;28" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Main outer circle with gradient -->
+  <circle cx="35" cy="35" r="24" fill="none" stroke="url(#mainGradient)" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Middle circle -->
+  <circle cx="35" cy="35" r="16" fill="url(#mainGradient)" filter="url(#shadow)"/>
+  
+  <!-- Inner orbiting circles (representing people/connection) -->
+  <g>
+    <!-- Left person -->
+    <circle cx="27" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;33;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Right person -->
+    <circle cx="43" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;37;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Connecting line (handshake representation) -->
+    <line x1="30" y1="35" x2="40" y2="35" stroke="#ffffff" stroke-width="1.5" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+  
+  <!-- Center heart/core -->
+  <circle cx="35" cy="35" r="4" fill="#ffffff">
+    <animate attributeName="r" values="4;5;4" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Text: Adapto -->
+  <text x="75" y="42" font-size="32" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="700" fill="url(#textGradient)">
+    Adapto
+  </text>
+  
+  <!-- Tagline -->
+  <text x="76" y="54" font-size="8" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="400" letter-spacing="2" fill="#64748b" opacity="0.8">
+    FOR HUMANITY
+  </text>
+  
+  <!-- Decorative dots -->
+  <circle cx="190" cy="20" r="2" fill="url(#mainGradient)" opacity="0.6">
+    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="185" cy="28" r="1.5" fill="url(#mainGradient)" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <a href="home.html">
+        <span class="icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" id="profileLink">
+        <span class="icon">👤</span>
+        <span>Profile Settings</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Services</div>
+      <a href="language-support.html">
+        <span class="icon">💬</span>
+        <span>Language Support</span>
+      </a>
+      <a href="healthcare.html">
+        <span class="icon">🏥</span>
+        <span>Healthcare</span>
+      </a>
+      <a href="housing.html" class="active">
+        <span class="icon">🏡</span>
+        <span>Housing</span>
+      </a>
+      <a href="jobs.html">
+        <span class="icon">💼</span>
+        <span>Jobs</span>
+      </a>
+      <a href="emergency.html">
+        <span class="icon">🆘</span>
+        <span>Emergency</span>
+      </a>
+      <a href="community.html">
+        <span class="icon">🤝</span>
+        <span>Community</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Tools</div>
+      <a href="documentAnalyzer.html" class="active">
+        <span class="icon">📄</span>
+        <span>Document Analyzer</span>
+      </a>
+    </div>
+    <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="header">
+      <h1>🏡 Housing Services</h1>
+      <p>Find safe, verified housing options or post available accommodations. Help refugees find their new home.</p>
+    </div>
+
+    <div class="content-area">
+      <!-- POST HOUSING -->
+      <div class="post-section">
+        <h3 class="section-title">
+          <span>📝</span>
+          <span>Post Housing</span>
+        </h3>
+
+        <div class="form-field">
+          <label>Property Title *</label>
+          <input type="text" id="title" placeholder="e.g. Cozy 2-bedroom apartment" />
+        </div>
+
+        <div class="form-field">
+          <label>Full Address *</label>
+          <input type="text" id="address" placeholder="Street address, city, state" />
+        </div>
+
+        <div class="form-field">
+          <label>Capacity (People) *</label>
+          <input type="number" id="capacity" placeholder="How many people can stay?" min="1" />
+        </div>
+
+        <div class="form-field">
+          <label>Description *</label>
+          <textarea id="description" placeholder="Describe the property, amenities, nearby facilities..."></textarea>
+        </div>
+
+        <div class="form-field">
+          <label>Location on Map *</label>
+          <div id="postMap"></div>
+          <div class="map-hint">
+            <span>📍</span>
+            <span>Click on the map to mark the exact location</span>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="submitBtn">
+          <span>🏠</span>
+          <span>Post Housing</span>
+        </button>
+      </div>
+
+      <!-- SEARCH & LIST -->
+      <div class="search-section">
+        <div class="search-controls">
+          <h3>🔍 Find Housing</h3>
+          <div class="search-input-group">
+            <input type="number" id="radius" placeholder="Search radius (km)" value="10" min="1" max="100" />
+            <button class="btn-search" id="searchBtn">Search</button>
+          </div>
+        </div>
+
+        <div class="housing-list" id="housingList">
+          <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <div style="color: #5eead4; font-weight: 600;">Loading housing options...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+      <button class="close-modal" id="closeModal">×</button>
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <p>Update your personal information</p>
+      </div>
+
+      <div class="profile-field">
+        <label>Full Name</label>
+        <input type="text" id="nameField" placeholder="Enter your name" />
+      </div>
+
+      <div class="profile-field">
+        <label>Email Address</label>
+        <input type="email" id="emailField" placeholder="Your email" disabled />
+      </div>
+
+      <button class="save-btn" id="saveProfile">💾 Save Changes</button>
+    </div>
+  </div>
+
+  <!-- FIREBASE & SCRIPTS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      serverTimestamp,
+      GeoPoint
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyAMkmKcKo-5qQciPsBVJI5hUgsiPHlB-bg",
+  authDomain: "adapto-1f1e2.firebaseapp.com",
+  projectId: "adapto-1f1e2",
+  storageBucket: "adapto-1f1e2.firebasestorage.app",
+  messagingSenderId: "258658013306",
+  appId: "1:258658013306:web:d5077f91ce58e8ad24abc3",
+  measurementId: "G-RCHLFYJHGY"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let postMap, marker;
+    let selectedLat = null;
+    let selectedLng = null;
+    let userLat, userLng;
+
+    // Distance calculation
+    function distanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
+    // ✅ Auth State
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById("nameField").value = data.name || "User";
+        document.getElementById("emailField").value = data.email || user.email;
+      }
+
+      getLocation();
+    });
+
+    // Get user location
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            userLat = position.coords.latitude;
+            userLng = position.coords.longitude;
+            initMap();
+            loadHousing();
+          },
+          (error) => {
+            console.error("Geolocation error:", error);
+            alert("Please enable location access to use housing services");
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser");
+      }
+    }
+
+    // Initialize map
+    function initMap() {
+      postMap = L.map("postMap").setView([userLat, userLng], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
+        maxZoom: 19
+      }).addTo(postMap);
+
+      // User location marker
+      const userIcon = L.divIcon({
+        className: 'custom-user-marker',
+        html: '<div style="background: linear-gradient(135deg, #2dd4bf, #14b8a6); width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
+        iconSize: [16, 16]
+      });
+
+      L.marker([userLat, userLng], { icon: userIcon })
+        .addTo(postMap)
+        .bindPopup("📍 Your Location");
+
+      // Click to add housing location
+      postMap.on("click", (e) => {
+        selectedLat = e.latlng.lat;
+        selectedLng = e.latlng.lng;
+
+        if (marker) postMap.removeLayer(marker);
+
+        const houseIcon = L.divIcon({
+          className: 'custom-house-marker',
+          html: '<div style="background: #5eead4; color: #0f1419; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">🏠</div>',
+          iconSize: [30, 30]
+        });
+
+        marker = L.marker([selectedLat, selectedLng], { icon: houseIcon })
+          .addTo(postMap)
+          .bindPopup("🏠 Housing Location")
+          .openPopup();
+      });
+    }
+
+    // ✅ Post Housing
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const title = document.getElementById("title").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const capacity = document.getElementById("capacity").value;
+      const description = document.getElementById("description").value.trim();
+
+      if (!title || !address || !capacity || !description) {
+        alert("⚠️ Please fill in all fields");
+        return;
+      }
+
+      if (!selectedLat || !selectedLng) {
+        alert("⚠️ Please select a location on the map");
+        return;
+      }
+
+      try {
+        const submitBtn = document.getElementById("submitBtn");
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></span><span>Posting...</span>';
+        submitBtn.disabled = true;
+
+        await addDoc(collection(db, "housing"), {
+          title,
+          address,
+          capacity: Number(capacity),
+          description,
+          location: new GeoPoint(selectedLat, selectedLng),
+          postedBy: currentUser.uid,
+          createdAt: serverTimestamp()
+        });
+
+        alert("✅ Housing posted successfully!");
+
+        // Clear form
+        document.getElementById("title").value = "";
+        document.getElementById("address").value = "";
+        document.getElementById("capacity").value = "";
+        document.getElementById("description").value = "";
+        
+        if (marker) postMap.removeLayer(marker);
+        selectedLat = null;
+        selectedLng = null;
+
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+
+        loadHousing();
+      } catch (error) {
+        console.error("Error posting housing:", error);
+        alert("❌ Failed to post housing. Please try again.");
+        
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.innerHTML = '<span>🏠</span><span>Post Housing</span>';
+        submitBtn.disabled = false;
+      }
+    });
+
+    // ✅ Load Housing
+    async function loadHousing() {
+      const radius = Number(document.getElementById("radius").value);
+      const housingList = document.getElementById("housingList");
+
+      housingList.innerHTML = `
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+          <div style="color: #5eead4; font-weight: 600;">Searching for housing...</div>
+        </div>
+      `;
+
+      try {
+        const snapshot = await getDocs(collection(db, "housing"));
+
+        if (snapshot.empty) {
+          housingList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🏡</div>
+              <h3>No Housing Available</h3>
+              <p>Be the first to post housing in this area!</p>
+            </div>
+          `;
+          return;
+        }
+
+        const housings = [];
+
+        snapshot.forEach(docSnap => {
+          const housing = docSnap.data();
+          const distance = distanceKm(
+            userLat,
+            userLng,
+            housing.location.latitude,
+            housing.location.longitude
+          );
+
+          if (distance <= radius) {
+            housings.push({
+              id: docSnap.id,
+              ...housing,
+              distance
+            });
+          }
+        });
+
+        housings.sort((a, b) => a.distance - b.distance);
+
+        if (housings.length === 0) {
+          housingList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🔍</div>
+              <h3>No Results Found</h3>
+              <p>Try increasing the search radius to find more options.</p>
+            </div>
+          `;
+          return;
+        }
+
+        housingList.innerHTML = "";
+
+        housings.forEach(housing => {
+          const isOwner = housing.postedBy === currentUser.uid;
+          
+          const card = document.createElement("div");
+          card.className = "housing-card";
+          card.innerHTML = `
+            <div class="housing-header">
+              <div>
+                <div class="housing-title">${housing.title}</div>
+                <div class="housing-address">
+                  <span>📍</span>
+                  <span>${housing.address}</span>
+                </div>
+              </div>
+              ${isOwner ? '<div class="housing-badge">Your Listing</div>' : ''}
+            </div>
+
+            <div class="housing-info">
+              <div class="info-item">
+                <span class="info-label">Capacity:</span>
+                <span class="info-value">${housing.capacity} people</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Distance:</span>
+                <span class="info-value">${housing.distance.toFixed(2)} km</span>
+              </div>
+            </div>
+
+            <div class="housing-description">${housing.description}</div>
+
+            <div class="housing-actions">
+              <button class="btn-view" onclick="viewOnMap(${housing.location.latitude}, ${housing.location.longitude}, '${housing.title.replace(/'/g, "\\'")}')">
+                <span>📍</span>
+                <span>View on Map</span>
+              </button>
+              ${isOwner ? `
+                <button class="btn-delete" onclick="deleteHousing('${housing.id}')">
+                  <span>🗑️</span>
+                  <span>Delete</span>
+                </button>
+              ` : ''}
+            </div>
+          `;
+
+          housingList.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Error loading housing:", error);
+        housingList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <h3>Error Loading Housing</h3>
+            <p>Please try again or refresh the page.</p>
+          </div>
+        `;
+      }
+    }
+
+    // ✅ Search Button
+    document.getElementById("searchBtn").addEventListener("click", () => {
+      loadHousing();
+    });
+
+    // ✅ View on Map
+    window.viewOnMap = (lat, lng, title) => {
+      postMap.setView([lat, lng], 16);
+      
+      const houseIcon = L.divIcon({
+        className: 'custom-house-marker',
+        html: '<div style="background: #5eead4; color: #0f1419; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid white; box-shadow: 0 3px 15px rgba(0,0,0,0.4);">🏠</div>',
+        iconSize: [35, 35]
+      });
+
+      const viewMarker = L.marker([lat, lng], { icon: houseIcon })
+        .addTo(postMap)
+        .bindPopup(`<div style="color: #0f1419; font-weight: 600;">🏠 ${title}</div>`)
+        .openPopup();
+
+      // Scroll to map section
+      document.querySelector('.post-section').scrollTop = 0;
+    };
+
+    // ✅ Delete Housing
+    window.deleteHousing = async (id) => {
+      if (!confirm("Are you sure you want to delete this housing listing?")) return;
+
+      try {
+        await deleteDoc(doc(db, "housing", id));
+        alert("✅ Housing deleted successfully!");
+        loadHousing();
+      } catch (error) {
+        console.error("Error deleting housing:", error);
+        alert("❌ Failed to delete housing. Please try again.");
+      }
+    };
+
+    // ✅ Profile Modal
+    const profileModal = document.getElementById("profileModal");
+    const profileLink = document.getElementById("profileLink");
+    const closeModal = document.getElementById("closeModal");
+
+    profileLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      profileModal.classList.add("active");
+    });
+
+    closeModal.addEventListener("click", () => {
+      profileModal.classList.remove("active");
+    });
+
+    profileModal.addEventListener("click", (e) => {
+      if (e.target === profileModal) {
+        profileModal.classList.remove("active");
+      }
+    });
+
+    // ✅ Save Profile
+    document.getElementById("saveProfile").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const newName = document.getElementById("nameField").value.trim();
+
+      if (!newName) {
+        alert("Name cannot be empty!");
+        return;
+      }
+
+      await setDoc(doc(db, "users", user.uid), {
+        name: newName
+      }, { merge: true });
+
+      alert("✅ Profile updated successfully!");
+      profileModal.classList.remove("active");
+    });
+
+    // ✅ Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      if (confirm("Are you sure you want to logout?")) {
+        await signOut(auth);
+        window.location.href = "index.html";
+      }
+    });
+
+    // ✅ Active Link Highlighting
+    document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', function() {
+        document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+  </script>
+
+</body>
+</html>
