@@ -845,10 +845,10 @@
       const query = `
         [out:json];
         (
-          node["amenity"="hospital"](around:5000, ${userLat}, ${userLng});
-          node["amenity"="clinic"](around:5000, ${userLat}, ${userLng});
-          node["amenity"="pharmacy"](around:5000, ${userLat}, ${userLng});
-          node["amenity"="doctors"](around:5000, ${userLat}, ${userLng});
+          node["amenity"="hospital"](around:15000, ${userLat}, ${userLng});
+          node["amenity"="clinic"](around:15000, ${userLat}, ${userLng});
+          node["amenity"="pharmacy"](around:15000, ${userLat}, ${userLng});
+          node["amenity"="doctors"](around:15000, ${userLat}, ${userLng});
         );
         out body;
       `;
