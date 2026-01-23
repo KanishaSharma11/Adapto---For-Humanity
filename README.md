@@ -54,7 +54,7 @@ Every day, **millions of people** face critical barriers:
 
 </td>
 <td width="50%">
-
+    
 ### Our Approach
 
 **Most solutions are fragmented.** People juggle multiple apps just to survive.
