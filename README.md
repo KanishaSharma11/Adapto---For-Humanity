@@ -17,6 +17,7 @@
 
 </div>
 <div align="center">
+    
 ## 🌍 Overview
 
 > **Adapto** bridges the gap between technology and humanity, providing critical support to those who need it most. When someone is displaced, lost, or in crisis, every second counts. Adapto ensures that help is always just one tap away.
