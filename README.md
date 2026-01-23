@@ -1,3 +1,4 @@
+<div align="center">
 # 🤝 Adapto - For Humanity
 
 ### *Technology That Adapts to Humans*
