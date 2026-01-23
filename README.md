@@ -1,7 +1,92 @@
 <div align="center">
-
-![Adapto Header](https://via.placeholder.com/1200x300/4F46E5/ffffff?text=ADAPTO)
-
+<svg width="200" height="70" viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main gradient -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="50%" stop-color="#7b2ff7"/>
+      <stop offset="100%" stop-color="#3d7dd9"/>
+    </linearGradient>
+    
+    <!-- Glow gradient -->
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7b2ff7" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Text gradient -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="100%" stop-color="#7b2ff7"/>
+    </linearGradient>
+    
+    <!-- Filter for shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Outer glow circles -->
+  <circle cx="35" cy="35" r="28" fill="url(#glowGradient)">
+    <animate attributeName="r" values="28;32;28" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Main outer circle with gradient -->
+  <circle cx="35" cy="35" r="24" fill="none" stroke="url(#mainGradient)" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Middle circle -->
+  <circle cx="35" cy="35" r="16" fill="url(#mainGradient)" filter="url(#shadow)"/>
+  
+  <!-- Inner orbiting circles (representing people/connection) -->
+  <g>
+    <!-- Left person -->
+    <circle cx="27" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;33;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Right person -->
+    <circle cx="43" cy="35" r="3" fill="#ffffff" opacity="0.9">
+      <animate attributeName="cy" values="35;37;35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Connecting line (handshake representation) -->
+    <line x1="30" y1="35" x2="40" y2="35" stroke="#ffffff" stroke-width="1.5" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+  
+  <!-- Center heart/core -->
+  <circle cx="35" cy="35" r="4" fill="#ffffff">
+    <animate attributeName="r" values="4;5;4" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Text: Adapto -->
+  <text x="75" y="42" font-size="32" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="700" fill="url(#textGradient)">
+    Adapto
+  </text>
+  
+  <!-- Tagline -->
+  <text x="76" y="54" font-size="8" font-family="'Poppins', 'Segoe UI', sans-serif" font-weight="400" letter-spacing="2" fill="#64748b" opacity="0.8">
+    FOR HUMANITY
+  </text>
+  
+  <!-- Decorative dots -->
+  <circle cx="190" cy="20" r="2" fill="url(#mainGradient)" opacity="0.6">
+    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="185" cy="28" r="1.5" fill="url(#mainGradient)" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>
 # 🤝 Adapto
 
 ### *Technology That Adapts to Humans*
@@ -29,7 +114,7 @@
 
 | 🌐 Languages | 🏥 Healthcare | 🏠 Housing | 🆘 Emergency |
 |:---:|:---:|:---:|:---:|
-| **Multi-lingual** | **50km Radius** | **Community-Driven** | **One-Tap SOS** |
+| **Multi-lingual** | **10km Radius** | **Community-Driven** | **One-Tap SOS** |
 | Real-time translation | Map-based search | Peer-to-peer | Live location sharing |
 
 </div>
@@ -223,7 +308,7 @@ Fast, clear help without barriers when you need it most
 ├── 🏥 Hospitals & Emergency Rooms
 ├── 🏪 Clinics & Urgent Care
 ├── 💊 Pharmacies & Drugstores
-└── 📍 50km Search Radius
+└── 📍 10km Search Radius
 ```
 
 **Key Features:**
@@ -241,7 +326,7 @@ Fast, clear help without barriers when you need it most
 
 | 🏘️ Post Shelter | 🔍 Find Housing | 🗺️ Map View | 📞 Direct Contact |
 |:---:|:---:|:---:|:---:|
-| List your space | Search by location | Interactive maps | Connect instantly |
+| List your space | Search by km | Interactive maps | Connect instantly |
 
 </div>
 
