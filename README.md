@@ -121,7 +121,6 @@ graph TD
 
 ### 🌏 Migrants & Refugees
 
-<img src="https://via.placeholder.com/150/4F46E5/ffffff?text=🌏" alt="Migrants" width="100"/>
 
 Navigating new countries with language, housing, and healthcare support
 
@@ -130,7 +129,6 @@ Navigating new countries with language, housing, and healthcare support
 
 ### ✈️ Travelers & Tourists
 
-<img src="https://via.placeholder.com/150/10B981/ffffff?text=✈️" alt="Travelers" width="100"/>
 
 Quick access to local services and emergency assistance abroad
 
@@ -139,7 +137,6 @@ Quick access to local services and emergency assistance abroad
 
 ### 🌪️ Disaster Survivors
 
-<img src="https://via.placeholder.com/150/F59E0B/ffffff?text=🌪️" alt="Disaster" width="100"/>
 
 Urgent shelter, medical care, and community support after disasters
 
@@ -150,7 +147,6 @@ Urgent shelter, medical care, and community support after disasters
 
 ### 👴 Elderly Individuals
 
-<img src="https://via.placeholder.com/150/8B5CF6/ffffff?text=👴" alt="Elderly" width="100"/>
 
 Simplified technology and accessible service navigation
 
@@ -159,7 +155,6 @@ Simplified technology and accessible service navigation
 
 ### 🎓 Students & Workers
 
-<img src="https://via.placeholder.com/150/EC4899/ffffff?text=🎓" alt="Students" width="100"/>
 
 Settling into new environments for education or employment
 
@@ -168,7 +163,6 @@ Settling into new environments for education or employment
 
 ### 🆘 Anyone in Crisis
 
-<img src="https://via.placeholder.com/150/EF4444/ffffff?text=🆘" alt="Crisis" width="100"/>
 
 Fast, clear help without barriers when you need it most
 
@@ -211,7 +205,6 @@ Fast, clear help without barriers when you need it most
 
 <div align="center">
 
-![Healthcare Map](https://via.placeholder.com/800x400/10B981/ffffff?text=Interactive+Healthcare+Map)
 
 </div>
 
@@ -310,8 +303,6 @@ graph LR
 ### 🚨 Emergency SOS System
 
 <div align="center">
-
-![SOS Interface](https://via.placeholder.com/600x300/EF4444/ffffff?text=ONE+TAP+CAN+SAVE+A+LIFE)
 
 </div>
 
@@ -418,7 +409,6 @@ Shared
 
 ### Built With Modern, Accessible Technologies
 
-![Tech Stack](https://via.placeholder.com/1000x150/4F46E5/ffffff?text=HTML5+•+CSS3+•+JavaScript+•+Firebase+•+OpenStreetMap)
 
 </div>
 
@@ -736,8 +726,6 @@ If you believe in accessible technology for all, consider:
 ---
 
 <div align="center">
-
-![Footer](https://via.placeholder.com/1200x100/4F46E5/ffffff?text=)
 
 ### 💙 Made with Compassion for Humanity
 
